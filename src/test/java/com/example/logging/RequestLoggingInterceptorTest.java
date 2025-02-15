@@ -1,24 +1,29 @@
 package com.example.logging;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import static org.mockito.Mockito.when;
 
-
 public class RequestLoggingInterceptorTest {
+    // private final Logger log = LoggerFactory.getLogger(RequestLoggingInterceptorTest.class);
     private RequestLoggingInterceptor interceptor;
     private HttpServletRequest request;
     private HttpServletResponse response;
 
     @BeforeEach
     public void setUp() {
+        MDC.clear();
         interceptor = new RequestLoggingInterceptor();
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
@@ -37,13 +42,13 @@ public class RequestLoggingInterceptorTest {
         boolean result = interceptor.preHandle(request, response, new Object());
 
         assertTrue(result);
-        assertTrue(MDC.get(LoggingField.COOKIE).isEmpty());
-        assertTrue(MDC.get(LoggingField.DEST).equals("127.0.0.1"));
-        assertTrue(MDC.get(LoggingField.DEST_PORT).equals("8080"));
-        assertTrue(MDC.get(LoggingField.HTTP_CONTENT_TYPE).equals("application/json"));
-        assertTrue(MDC.get(LoggingField.HTTP_METHOD).equals("GET"));
-        assertTrue(MDC.get(LoggingField.HTTP_REFERRER).equals("http://example.com"));
-        assertTrue(MDC.get(LoggingField.HTTP_USER_AGENT).equals("Mozilla/5.0"));
-        assertTrue(MDC.get(LoggingField.SRC).equals("127.0.0.1"));
+        assertEquals("", MDC.get(LoggingField.COOKIE));
+        assertEquals("127.0.0.1", MDC.get(LoggingField.DEST));
+        assertEquals("8080", MDC.get(LoggingField.DEST_PORT));
+        assertEquals("application/json", MDC.get(LoggingField.HTTP_CONTENT_TYPE));
+        assertEquals("GET", MDC.get(LoggingField.HTTP_METHOD));
+        assertEquals("http://example.com", MDC.get(LoggingField.HTTP_REFERRER));
+        assertEquals("Mozilla/5.0", MDC.get(LoggingField.HTTP_USER_AGENT));
+        assertEquals("127.0.0.1", MDC.get(LoggingField.SRC));
     }
 }
